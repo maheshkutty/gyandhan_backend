@@ -1,0 +1,49 @@
+POST http://localhost:5000/student/register HTTP/1.1
+Content-Type: application/json
+
+{
+    "email":"ff@gmail.com"
+}
+
+###
+
+GET  http://localhost:5000/doubts HTTP/1.1
+
+
+###
+GET http://localhost:5000/blogs HTTP/1.1
+
+###
+POST http://localhost:5000/student/request HTTP/1.1
+Content-Type: application/json
+
+{
+  "sid":"8",
+  "subjects":["maths"],
+  "daysOfWeek":["monday"],
+  "startTime":"11:00",
+  "endTime":"12:00",
+  "topics":["class 10 maths"]
+}
+
+###
+POST http://localhost:5000/mentor/expertise HTTP/1.1
+Content-Type: application/json
+
+{
+    "mid":1,
+    "daysOfWeek":["sunday", "monday"],
+    "subjects":["maths", "geography"],
+    "startTime":"17:00",
+    "endTime":"19:00"
+}
+
+
+###
+
+POST http://localhost:5000/mentor/studentreq HTTP/1.1
+Content-Type: application/json
+
+{
+    "mid":"1"
+}
