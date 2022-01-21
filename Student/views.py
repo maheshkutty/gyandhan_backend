@@ -108,3 +108,27 @@ def createMeetRequest():
         except Exception as e:
             print(e)
             return jsonify({"msg":str(e), "status":"unsuccess"})
+
+def All_LiveClasses():
+    if request.method == "GET":
+        try:
+            conn = get_db()
+            cursor = conn.cursor()
+            # content = request.json
+            cursor.execute("SELECT * from Classes")
+            r = [dict((cursor.description[i][0], value) \
+               for i, value in enumerate(row)) for row in cursor.fetchall()]
+            # myresult = cursor.fetchall()
+            op = []
+            for cls in r:                
+                flag = validDate( cls["Start_dateTime"] , cls["End_dateTime"]) 
+                
+                if flag[0]:
+                    op.append(cls)
+                    # print("===================",cls["Start_dateTime"]) 
+            return json.dumps(op ,indent=4, sort_keys=True, default=str)
+
+
+        except Exception as e:
+            print(e)
+            return jsonify({"msg":str(e), "status":"unsuccess"})

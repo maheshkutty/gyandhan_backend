@@ -144,3 +144,23 @@ def mappingStudentReq():
         except Exception as e:
             print(e)
             return jsonify({"msg":str(e), "status":"unsuccess"})
+
+
+def AcceptingStudentReq():
+    if request.method == "GET":
+        try:
+            conn = get_db()
+            cursor = conn.cursor()    
+            content = request.json
+            Stud_id = content["sid"]
+            mid = content["mid"]
+            rid = content["rid"]
+            sql = "UPDATE Session_Requests SET status = 1 , Men_id = %s WHERE id = %s" 
+            cursor.execute(sql, (int(mid) , int(rid)))
+           
+            conn.commit()
+            cursor.close()
+            return jsonify({"msg":"Session Confirmed", "status":"success"})
+        except Exception as e:
+            print(e)
+            return jsonify({"msg":str(e), "status":"unsuccess"})
