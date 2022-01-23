@@ -43,6 +43,47 @@ def Blogs():
         except Exception as e:
             return jsonify({"msg":str(e), "status":"unsuccess"})
 
+@app.route('/blogs/comment', methods=['GET', 'POST'])
+def BlogsComments():  
+    if request.method == "GET":
+        try:
+            conn = get_db()
+            cursor = conn.cursor()
+            cursor.execute("SELECT * from Blog_review")
+            r = [dict((cursor.description[i][0], value) \
+               for i, value in enumerate(row)) for row in cursor.fetchall()]
+            # myresult = cursor.fetchall()
+            return json.dumps(r ,indent=4, sort_keys=True, default=str)
+        except Exception as e:
+            return jsonify({"msg":str(e), "status":"unsuccess"})
+
+    elif request.method == "POST":
+            try:
+                conn = get_db()
+                cursor = conn.cursor()
+                content = request.json
+                
+                b_id = str(content["b_id"])
+                Stud_id = str(content["Stud_id"])
+                Men_id = str(content["Men_id"])
+                comment = str(content["comment"])
+
+                print(  Stud_id)
+                print( Men_id )
+
+                if (Stud_id == "None"):
+                    cursor.execute("insert into Blog_review (b_id,Men_id,comment) values (%s,%s,%s);", (int(b_id),int(Men_id),str(comment)))                
+                else:
+                    cursor.execute("insert into Blog_review (b_id,Stud_id,comment) values (%s,%s,%s);", (int(b_id),int(Stud_id),str(comment)))                
+
+                conn.commit()               
+                cursor.close()
+                return jsonify({ "status":"success"})
+                
+            except Exception as e:
+                return jsonify({"msg":str(e), "status":"unsuccess"})
+
+
 @app.route('/doubts', methods=['GET', 'POST'])
 def Doubts():  
     if request.method == "GET":
@@ -58,95 +99,86 @@ def Doubts():
             return jsonify({"msg":str(e), "status":"unsuccess"})
 
 
-   
-   
+@app.route('/doubts/comment', methods=['GET', 'POST'])
+def DoubtsComments():  
+    if request.method == "GET":
+        try:
+            conn = get_db()
+            cursor = conn.cursor()
+            cursor.execute("SELECT * from Doubt_review")
+            r = [dict((cursor.description[i][0], value) \
+               for i, value in enumerate(row)) for row in cursor.fetchall()]
+            # myresult = cursor.fetchall()
+            return json.dumps(r ,indent=4, sort_keys=True, default=str)
+        except Exception as e:
+            return jsonify({"msg":str(e), "status":"unsuccess"})
 
+    elif request.method == "POST":
+            try:
+                conn = get_db()
+                cursor = conn.cursor()
+                content = request.json
+                
+                dt_id = str(content["dt_id"])
+                Stud_id = str(content["Stud_id"])
+                Men_id = str(content["Men_id"])
+                comment = str(content["comment"])
+
+                print(  Stud_id)
+                print( Men_id )
+
+                if (Stud_id == "None"):
+                    cursor.execute("insert into Doubt_review (dt_id,Men_id,comment) values (%s,%s,%s);", (int(dt_id),int(Men_id),str(comment)))                
+                else:
+                    cursor.execute("insert into Doubt_review (dt_id,Stud_id,comment) values (%s,%s,%s);", (int(dt_id),int(Stud_id),str(comment)))                
+
+                conn.commit()               
+                cursor.close()
+                return jsonify({ "status":"success"})
+                
+            except Exception as e:
+                return jsonify({"msg":str(e), "status":"unsuccess"})
+
+@app.route('/doubts/like', methods=['GET', 'POST'])
+def DoubtsLike():  
+    if request.method == "POST":
+        try:
+            conn = get_db()
+            cursor = conn.cursor()
+            content = request.json            
+            dt_id = int(content["dt_id"])
+            action = str(content["action"])
+            cursor.execute("SELECT * from Doubts WHERE dt_id = %s", (dt_id))
+            res = cursor.fetchone()
+
+            res = dict((cursor.description[i][0], value) \
+               for i, value in enumerate(res)) 
+
+            print("============",res)
+            if action == "like" :
+                sql = "UPDATE Doubts SET d_likes = %s  WHERE dt_id = %s" 
+                cursor.execute(sql, (int(res["d_likes"] + 1) , int(dt_id)))
+
+                # sql = "UPDATE Doubts SET d_likes = %s  WHERE dt_id = %s" 
+                # cursor.execute(sql, (int(res["d_likes"] + 1) , int(dt_id)))
+                
+            else:
+                sql = "UPDATE Doubts SET d_dislikes = %s  WHERE dt_id = %s" 
+                cursor.execute(sql, (int(res["d_dislikes"] + 1) , int(dt_id)))
+           
+            conn.commit()
+            cursor.close()
+            return jsonify({ "status":"success"})
+        except Exception as e:
+            return jsonify({"msg":str(e), "status":"unsuccess"})
 
         
-# @app.route('/', methods=['GET', 'POST'])
-# def Home():  
-#    return render_template('base.html')
+
+   
    
 
-# @app.route("/login", methods=["GET", "POST"])
-# def login():
-#     if request.method == "POST":
-#         try :
-#             conn = get_db()
-#             cursor = conn.cursor()
-#             email = str(request.form['email'])
-#             password = str(request.form["password"])
-#             mydoc = cursor.execute("SELECT * from USERDETAILS WHERE U_EMAIL = :email AND U_PASSWORD = :password", email=email, password= password)
-#             myresult = mydoc.fetchone()
-#             cursor.close()
-#             if myresult:
-#                 session['email'] = str(myresult[1])
-#                 session['user_role'] = str(myresult[12])
-#                 session['fname'] = str(myresult[4])
-#                 if myresult[12].strip() == "P":
-#                     # code for passenger
-#                     return redirect('/Home')
-#                 elif myresult[12].strip() == "A":
-#                     # code for admin
-#                     return redirect('/admin/Home')
-#                 else:
-#                     return redirect('/Home')
-#             else:
-#                 return render_template('login.html', msg='email id or password is not matching')
 
-#         except Exception as e:
-#             return render_template('login.html', msg=e)
-#     else:
-#         return render_template('login.html')
-
-
-# @app.route("/register", methods=["GET", "POST"])
-# def register():
-#     if request.method == "POST":
-#         try:
-#             conn = get_db()
-#             cursor = conn.cursor()
-#             fname = str(request.form["fname"])
-#             mname = str(request.form['mname'])
-#             lname = str(request.form["lname"])
-#             password = str(request.form["password"])
-#             email = str(request.form['email'])
-#             phone = str(request.form['phoneNo'])
-#             state = str(request.form['state'])
-#             district = str(request.form['district'])
-#             addrline1 = str(request.form['addrline1'])
-#             city = str(request.form['city'])
-#             pincode = request.form['pincode']
-#             cursor.execute("SELECT * from USERDETAILS WHERE U_EMAIL = :email", email = str(email))
-#             if cursor.fetchall():
-#                 return render_template("sign.html", msg="Email Already Exist Try Different")
-#             else:
-#                userdata = dict(U_EMAIL = email, U_PASSWORD = password, U_PHONE = phone, U_F_NAME = fname, U_M_NAME = mname, U_L_NAME = lname, STATE = state, DISTRICT = district, CITY = city, PINCODE = pincode, LINE1 = addrline1, U_ROLE = 'P')
-#                cursor.execute('insert into USERDETAILS (U_EMAIL,U_PASSWORD,U_PHONE,U_F_NAME,U_M_NAME,U_L_NAME,STATE,DISTRICT,CITY,PINCODE,LINE1,U_ROLE) values (:U_EMAIL, :U_PASSWORD, :U_PHONE, :U_F_NAME, :U_M_NAME, :U_L_NAME, :STATE, :DISTRICT, :CITY, :PINCODE, :LINE1, :U_ROLE)', userdata)
-
-#                mydoc = cursor.execute("SELECT * from USERDETAILS WHERE U_EMAIL = :email" , email = str(email))
-#                myresult = mydoc.fetchone()
-#                conn.commit()
-
-#                 # print('Singin User :', myresult)
-#                 # session['username'] = str(fname)+" "+str(lname)
-#                 # session['email'] = str(email)
-#                 # session['user_id'] = myresult[0]
-#                 # session['user_role'] = str(myresult[4])
-#             cursor.close()
-#             # conn.close()
-#             return render_template('login.html', msg = 'Successfully Registered')
-
-#         except Exception as e:
-#             return render_template('sign.html', msg=e)
-#     else:
-#         return render_template('sign.html')
-
-
-# @app.route("/logout", methods=["GET", "POST"])
-# def logout():
-#     session.clear()
-#     return redirect("/")
+ 
 
 if __name__ == "__main__":   
     app.run(host='0.0.0.0', port=3000, debug=True ) # localhost
