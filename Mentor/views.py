@@ -174,11 +174,14 @@ def AcceptingStudentReq():
             conn = get_db()
             cursor = conn.cursor()    
             content = request.json
+            print(content)
             Stud_id = content["sid"]
             mid = content["mid"]
             rid = content["rid"]
-            sql = "UPDATE Session_Requests SET status = 1 , Men_id = %s WHERE id = %s" 
-            cursor.execute(sql, (int(mid) , int(rid)))
+            sdate = str(content["sdate"])
+            sql = 'UPDATE Session_Requests SET status = 1 , Men_id = %s, sdate = STR_TO_DATE("%s", "%s-%s-%s") WHERE id = %s'
+            sql = sql % ((int(mid), str(sdate), str("%d"), str("%m"), str("%Y"), int(rid)))
+            cursor.execute(sql)
             conn.commit()
             cursor.close()
             return jsonify({"msg":"Session Confirmed", "status":"success"})

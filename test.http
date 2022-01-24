@@ -63,7 +63,7 @@ POST http://localhost:5000/mentor/studentreq HTTP/1.1
 Content-Type: application/json
 
 {
-    "mid":"1"
+    "mid":"5"
 }
 
 ###
@@ -80,4 +80,15 @@ Content-Type: application/json
 
 {
     "sid":"8"
+}
+
+###
+POST http://localhost:5000/mentor/accept-studentreq HTTP/1.1
+Content-Type: application/json
+
+{
+    "rid":"4",
+    "mid": "5",
+    "sid": "8",
+    "sdate": "29-01-2022"
 }
