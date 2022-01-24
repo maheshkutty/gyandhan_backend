@@ -16,8 +16,10 @@ from Mentor import views as MentorUrl
 app.add_url_rule('/student/register' , view_func = StudentUrl.Std_register , methods=['GET','POST'])
 app.add_url_rule('/student/login' , view_func = StudentUrl.Std_login , methods=['GET','POST'])
 app.add_url_rule('/student/create_doubt' , view_func = StudentUrl.Stud_CreateDoubt , methods=['GET','POST'])
-app.add_url_rule('/student/request' , view_func = StudentUrl.createMeetRequest , methods=['GET','POST'])
+app.add_url_rule('/student/askmeet' , view_func = StudentUrl.createMeetRequest , methods=['GET','POST'])
 app.add_url_rule('/student/all-live' , view_func = StudentUrl.All_LiveClasses , methods=['GET','POST'])
+app.add_url_rule('/student/showpendingmeet' , view_func = StudentUrl.showPendingMeetReq , methods=['GET','POST'])
+app.add_url_rule('/student/showconfirmedmeet' , view_func = StudentUrl.showConfirmedRequest , methods=['GET','POST'])
 
 # Mentor Urls
 app.add_url_rule('/mentor/register' , view_func = MentorUrl.Men_register , methods=['GET','POST'])
@@ -27,6 +29,7 @@ app.add_url_rule('/mentor/create_blog' , view_func = MentorUrl.Men_CreateBlog , 
 app.add_url_rule('/mentor/expertise' , view_func = MentorUrl.mentorsAvailibityCreate , methods=['GET','POST'])
 app.add_url_rule('/mentor/studentreq' , view_func = MentorUrl.mappingStudentReq , methods=['GET','POST'])
 app.add_url_rule('/mentor/accept-studentreq' , view_func = MentorUrl.AcceptingStudentReq , methods=['GET','POST'])
+# app.add_url_rule('/mentor/showconfirmedmeet' , view_func = MentorUrl.showConfirmedMeet , methods=['GET','POST'])
 
 
 @app.route('/blogs', methods=['GET', 'POST'])

@@ -6,7 +6,7 @@ from zoomAPI import *
 
 def Men_register():
     if request.method == "POST":
-        # try:
+        try:
             conn = get_db()
             cursor = conn.cursor()
             content = request.json
@@ -35,8 +35,8 @@ def Men_register():
                 return jsonify({"msg":"Successfully registerd", "status":"success"})
                 # return render_template('login.html', msg = 'Successfully Registered')
 
-        # except Exception as e:
-        #     return jsonify({"msg":str(e), "status":"unsuccess"})
+        except Exception as e:
+            return jsonify({"msg":str(e), "status":"unsuccess"})
             
     else:
         return jsonify({"msg":"UnSuccessfully registerd", "status":"unsuccess"})
@@ -117,6 +117,8 @@ def mentorsAvailibityCreate():
             startTime = content["startTime"]
             endTime = content["endTime"]   
             subjects = content["subjects"]
+            cursor.execute("delete from mentors_subjects where mid = %s", ((int(mid))))
+            cursor.execute("delete from mentors_weekdays where mid = %s", ((int(mid))))
             cursor.execute("update Mentors set starttime = %s, endtime = %s where Men_id = %s;", (str(startTime),str(endTime), int(mid)))
             for i in subjects:
                 cursor.execute("insert into mentors_subjects (subjects, mid) values (%s, %s); ", (str(i), int(mid)))
@@ -139,15 +141,35 @@ def mappingStudentReq():
             sql = "select * from (select sr.id as sessid, Stud_id, Start_Datetime, endtime, weekdays, subjects, status from Session_Requests sr, student_weekdays sw, student_subjects ss where sr.id = sw.rid and sr.id = sw.rid) as d, (select Men_id, starttime, endtime, weekdays, subjects from Mentors m, mentors_subjects ms, mentors_weekdays mw where m.Men_id = ms.mid and m.Men_id  = mw.mid and m.Men_id = %s) as f where d.Start_Datetime = f.starttime and d.weekdays = f.weekdays and d.subjects = f.subjects and status = 0 group by sessid;"
             cursor.execute(sql, (int(mid)))
             myresult = cursor.fetchall()
-            print(myresult)
-            return jsonify({"msg":"Mentors Availibility recorded", "status":"success"})
+            allSessionRequest = []
+            for id in myresult:
+                cursor.execute("select * from Session_Requests sr where sr.status = 0 and sr.id = %s", (int(id[0])))
+                sessionResult = cursor.fetchall()
+                for item in sessionResult:
+                    individualReq = {}
+                    individualReq["startTime"] = item[2]
+                    individualReq["endTime"] = item[6]
+                    individualReq["rid"] = item[0]
+                    cursor.execute("select * from student_subjects where rid = %s", (int(item[0])))
+                    subjects = cursor.fetchall()
+                    individualReq["subjects"] = [item[1] for item in subjects]
+                    cursor.execute("select * from student_weekdays where rid = %s", (int(item[0])))
+                    weekdays = cursor.fetchall()
+                    individualReq["weekdays"] = [item[1] for item in weekdays]
+                    cursor.execute("select * from student_topics where rid = %s", (int(item[0])))
+                    topics = cursor.fetchall()
+                    individualReq["topics"] = [item[1] for item in topics]
+                    allSessionRequest.append(individualReq)
+                print(myresult)
+            cursor.close()
+            return jsonify({"pendingReq":allSessionRequest, "status":"success"})
         except Exception as e:
             print(e)
             return jsonify({"msg":str(e), "status":"unsuccess"})
 
 
 def AcceptingStudentReq():
-    if request.method == "GET":
+    if request.method == "POST":
         try:
             conn = get_db()
             cursor = conn.cursor()    
@@ -157,10 +179,11 @@ def AcceptingStudentReq():
             rid = content["rid"]
             sql = "UPDATE Session_Requests SET status = 1 , Men_id = %s WHERE id = %s" 
             cursor.execute(sql, (int(mid) , int(rid)))
-           
             conn.commit()
             cursor.close()
             return jsonify({"msg":"Session Confirmed", "status":"success"})
         except Exception as e:
             print(e)
             return jsonify({"msg":str(e), "status":"unsuccess"})
+
+# def showConfirmedMeet():

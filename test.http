@@ -6,6 +6,24 @@ Content-Type: application/json
 }
 
 ###
+POST http://localhost:5000/student/login HTTP/1.1
+Content-Type: application/json
+
+{
+    "email":"maheshkutty@gmail.com",
+    "pass":"Mahesh@123"
+}
+
+###
+POST http://localhost:5000/mentor/login HTTP/1.1
+Content-Type: application/json
+
+{
+    "email":"h@gmail.com",
+    "pass":"Mahesh@14"
+}
+
+###
 
 GET  http://localhost:5000/doubts HTTP/1.1
 
@@ -31,11 +49,11 @@ POST http://localhost:5000/mentor/expertise HTTP/1.1
 Content-Type: application/json
 
 {
-    "mid":1,
+    "mid":5,
     "daysOfWeek":["sunday", "monday"],
     "subjects":["maths", "geography"],
-    "startTime":"17:00",
-    "endTime":"19:00"
+    "startTime":"09:00",
+    "endTime":"11:00"
 }
 
 
@@ -46,4 +64,20 @@ Content-Type: application/json
 
 {
     "mid":"1"
+}
+
+###
+POST http://localhost:5000/student/showpendingmeet HTTP/1.1
+Content-Type: application/json
+
+{
+    "sid":"8"
+}
+
+###
+POST http://localhost:5000/student/showconfirmedmeet HTTP/1.1
+Content-Type: application/json
+
+{
+    "sid":"8"
 }

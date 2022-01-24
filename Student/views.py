@@ -1,4 +1,6 @@
 # import curses
+from calendar import weekday
+from operator import sub
 from unittest import result
 from flask import Flask, request, render_template,  redirect,  session , jsonify
 import json
@@ -105,6 +107,71 @@ def createMeetRequest():
             conn.commit()               
             cursor.close()
             return jsonify({"msg":"meet request created", "status":"success"})
+        except Exception as e:
+            print(e)
+            return jsonify({"msg":str(e), "status":"unsuccess"})
+
+def showPendingMeetReq():
+    if request.method == "POST":
+        try:
+            req = request.json
+            conn = get_db()
+            cursor = conn.cursor()
+            cursor.execute("select * from Session_Requests sr where sr.status = 0 and sr.Stud_id = %s", (int(req["sid"])))
+            sessionResult = cursor.fetchall()
+            allSessionRequest = []
+            for item in sessionResult:
+                individualReq = {}
+                individualReq["startTime"] = item[2]
+                individualReq["endTime"] = item[6]
+                individualReq["sid"] = item[0]
+                cursor.execute("select * from student_subjects where rid = %s", (int(item[0])))
+                subjects = cursor.fetchall()
+                individualReq["subjects"] = [item[1] for item in subjects]
+                cursor.execute("select * from student_weekdays where rid = %s", (int(item[0])))
+                weekdays = cursor.fetchall()
+                individualReq["weekdays"] = [item[1] for item in weekdays]
+                cursor.execute("select * from student_topics where rid = %s", (int(item[0])))
+                topics = cursor.fetchall()
+                individualReq["topics"] = [item[1] for item in topics]
+                allSessionRequest.append(individualReq)
+            cursor.close()
+            res = {"pendingReq":allSessionRequest}
+            return res
+        except Exception as e:
+            print(e)
+            return jsonify({"msg":str(e), "status":"unsuccess"})
+                
+
+def showConfirmedRequest():
+    if request.method == "POST":
+        try:
+            req = request.json
+            conn = get_db()
+            cursor = conn.cursor()
+            cursor.execute("select * from Session_Requests sr where sr.status = 1 and sr.Stud_id = %s", (int(req["sid"])))
+            sessionResult = cursor.fetchall()
+            allSessionRequest = []
+            for item in sessionResult:
+                individualReq = {}
+                individualReq["startTime"] = item[2]
+                individualReq["endTime"] = item[6]
+                individualReq["sid"] = item[0]
+                meetLink = cursor.execute("select Men_mlink from Mentors where Men_id = %s", (int(item[5])))
+                individualReq["meetLink"] = meetLink[0]
+                cursor.execute("select * from student_subjects where rid = %s", (int(item[0])))
+                subjects = cursor.fetchall()
+                individualReq["subjects"] = [item[1] for item in subjects]
+                cursor.execute("select * from student_weekdays where rid = %s", (int(item[0])))
+                weekdays = cursor.fetchall()
+                individualReq["weekdays"] = [item[1] for item in weekdays]
+                cursor.execute("select * from student_topics where rid = %s", (int(item[0])))
+                topics = cursor.fetchall()
+                individualReq["topics"] = [item[1] for item in topics]
+                allSessionRequest.append(individualReq)
+            cursor.close()
+            res = {"confiremdReq":allSessionRequest}
+            return res
         except Exception as e:
             print(e)
             return jsonify({"msg":str(e), "status":"unsuccess"})
