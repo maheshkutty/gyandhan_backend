@@ -199,3 +199,21 @@ def All_LiveClasses():
         except Exception as e:
             print(e)
             return jsonify({"msg":str(e), "status":"unsuccess"})
+
+def submit_submission():
+    if request.method == "POST":
+        try :
+            conn = get_db()
+            cursor = conn.cursor()
+            content = request.json
+            A_id = str(content["A_id"])
+            Stud_id = str(content["Stud_id"])
+            Sub_docs = str(content["Sub_docs"])            
+           
+            cursor.execute("insert into Submissions (A_id , Stud_id , Sub_docs  ) values (%s,%s,%s);", ( A_id , Stud_id , Sub_docs ))
+            conn.commit()               
+            cursor.close()
+            return jsonify({"msg":"Successfully Class created", "status":"success"})
+    
+        except Exception as e:
+            return jsonify({"msg":str(e), "status":"unsuccess"})

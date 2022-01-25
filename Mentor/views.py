@@ -73,17 +73,19 @@ def Men_CreateClass():
             cursor = conn.cursor()
             content = request.json
             Men_id = str(content["Men_id"])
-            # Class_dateTime = content["Class_dateTime"]
+            Class_title = str(content["Class_title"])
+            Start_dateTime = str(content["Start_dateTime"])
+            End_dateTime = str(content["End_dateTime"])
+            flag = ClassValidTime( Start_dateTime , End_dateTime )
+            if flag[0] :
+                cursor.execute("insert into Classes (Men_id , Start_dateTime , End_dateTime , Class_title ) values (%s,%s,%s,%s);", (str(Men_id) , Start_dateTime , End_dateTime , Class_title))
+                conn.commit()               
+                cursor.close()
+                return jsonify({"msg":"Successfully Class created", "status":"success"})
 
-            # if Class_dateTime :
-            #     cursor.execute("insert into Classes (Men_id , Class_dateTime) values (%s,%s);", (str(Men_id) , datetime(Class_dateTime)))
-            # else:
-            cursor.execute("insert into Classes (Men_id) values (%s);", (str(Men_id)))
-           
-            conn.commit()               
-            cursor.close()
-            return jsonify({"msg":"Successfully Class created", "status":"success"})
-
+            else:
+                return jsonify({"msg":"Class creation timings were not valid.", "status":"Unsuccess"})
+        
         except Exception as e:
             return jsonify({"msg":str(e), "status":"unsuccess"})
 
@@ -190,3 +192,22 @@ def AcceptingStudentReq():
             return jsonify({"msg":str(e), "status":"unsuccess"})
 
 # def showConfirmedMeet():
+
+def Create_ClassAssignment():
+    if request.method == "POST":
+        try :
+            conn = get_db()
+            cursor = conn.cursor()
+            content = request.json
+            Men_id = str(content["Men_id"])
+            Class_id = str(content["Class_id"])
+            A_Title = str(content["A_Title"])
+            Content = str(content["content"])
+           
+            cursor.execute("insert into Assignments (Men_id , Class_id , Content , A_Title ) values (%s,%s,%s,%s);", (str(Men_id) , Class_id , Content , A_Title))
+            conn.commit()               
+            cursor.close()
+            return jsonify({"msg":"Successfully Class Assignment created", "status":"success"})
+    
+        except Exception as e:
+            return jsonify({"msg":str(e), "status":"unsuccess"})
