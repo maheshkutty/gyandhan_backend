@@ -1,3 +1,4 @@
+from calendar import c
 from flask import Flask, request, render_template,  redirect,  session , jsonify
 import json
 from datetime import datetime
@@ -65,6 +66,36 @@ def Men_login():
         except Exception as e:
             return jsonify({"Msg":str(e), "status":"unsuccess"})
 
+def personalDetails():
+    if request.method == "POST":
+        try :
+            conn = get_db()
+            cursor = conn.cursor()
+            content = request.json
+            mid = content["mid"]
+            print(mid)
+            cursor.execute("select * from Mentors where Men_id = %s", (int(mid)))
+            personalData = cursor.fetchone()
+            print(personalData)
+            res = {"paDetails":{}, "subjects":[], "weekdays":[]}
+            if personalData == None:
+                return jsonify(res)
+            res["paDetails"]["name"] = personalData[2]
+            res["paDetails"]["add"] = personalData[3]
+            res["paDetails"]["phone"] = personalData[5]
+            res["paDetails"]["email"] = personalData[6]
+            cursor.execute("select * from mentors_subjects where mid = %s", (int(mid)))
+            subjectsDetails = cursor.fetchall()
+            if subjectsDetails != None:
+                res["subjects"] = [i[2] for i in subjectsDetails]
+            cursor.execute("select * from mentors_weekdays where mid = %s", (int(mid)))
+            weekDaysAvail = cursor.fetchall()
+            if weekDaysAvail != None:
+                res["weekdays"] = [i[2] for i in weekDaysAvail]
+            return jsonify(res)
+        except Exception as e:
+            print(e)
+            return jsonify({"Msg":str(e), "status":"unsuccess"})
 
 def Men_CreateClass():
     if request.method == "POST":
@@ -189,4 +220,47 @@ def AcceptingStudentReq():
             print(e)
             return jsonify({"msg":str(e), "status":"unsuccess"})
 
-# def showConfirmedMeet():
+def showConfirmedMeet():
+    if request.method == "POST":
+        try:
+            conn = get_db()
+            cursor = conn.cursor()    
+            content = request.json
+            mid = content["mid"]
+            print(mid)
+            sql = "select sr.*,  DATE_FORMAT(sr.sdate, \"%s\") as strdate from Session_Requests sr where sr.Men_id = %d and sdate >= CURRENT_DATE()"
+            sql = sql % (str("%d-%m-%Y"),int(mid))
+            cursor.execute(sql)
+            confirmReq = cursor.fetchall()
+            print(confirmReq)
+            allSessionRequest = []
+            for item in confirmReq:
+                individualReq = {}
+                individualReq["startTime"] = item[2]
+                individualReq["endTime"] = item[6]
+                individualReq["rid"] = item[0]
+                individualReq["sdate"] = str(item[8])
+                cursor.execute("select Men_mlink from Mentors where Men_id = %s", (int(item[5])))
+                meetLink = cursor.fetchone()
+                if meetLink != None:
+                    meetLink = eval(meetLink[0])
+                    meetLink = meetLink[0]
+                else:
+                    meetLink = "";
+                individualReq["meetlink"] = meetLink
+                cursor.execute("select * from student_subjects where rid = %s", (int(item[0])))
+                subjects = cursor.fetchall()
+                individualReq["subjects"] = [item[1] for item in subjects]
+                cursor.execute("select * from student_weekdays where rid = %s", (int(item[0])))
+                weekdays = cursor.fetchall()
+                individualReq["weekdays"] = [item[1] for item in weekdays]
+                cursor.execute("select * from student_topics where rid = %s", (int(item[0])))
+                topics = cursor.fetchall()
+                individualReq["topics"] = [item[1] for item in topics]   
+                allSessionRequest.append(individualReq)
+            cursor.close()
+            return jsonify({"confirmedReq":allSessionRequest, "status":"success"})              
+        except Exception as e:    
+            print(e)
+            return jsonify({"msg":str(e), "status":"unsuccess"})
+

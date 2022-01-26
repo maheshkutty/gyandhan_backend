@@ -20,16 +20,18 @@ app.add_url_rule('/student/askmeet' , view_func = StudentUrl.createMeetRequest ,
 app.add_url_rule('/student/all-live' , view_func = StudentUrl.All_LiveClasses , methods=['GET','POST'])
 app.add_url_rule('/student/showpendingmeet' , view_func = StudentUrl.showPendingMeetReq , methods=['GET','POST'])
 app.add_url_rule('/student/showconfirmedmeet' , view_func = StudentUrl.showConfirmedRequest , methods=['GET','POST'])
+app.add_url_rule('/student/details' ,view_func = StudentUrl.studPersonalDetails , methods=['GET','POST'])
 
 # Mentor Urls
 app.add_url_rule('/mentor/register' , view_func = MentorUrl.Men_register , methods=['GET','POST'])
 app.add_url_rule('/mentor/login' , view_func = MentorUrl.Men_login , methods=['GET','POST'])
+app.add_url_rule('/mentor/details', view_func = MentorUrl.personalDetails , methods=['GET','POST'])
 app.add_url_rule('/mentor/create_class' , view_func = MentorUrl.Men_CreateClass , methods=['GET','POST'])
 app.add_url_rule('/mentor/create_blog' , view_func = MentorUrl.Men_CreateBlog , methods=['GET','POST'])
 app.add_url_rule('/mentor/expertise' , view_func = MentorUrl.mentorsAvailibityCreate , methods=['GET','POST'])
 app.add_url_rule('/mentor/studentreq' , view_func = MentorUrl.mappingStudentReq , methods=['GET','POST'])
 app.add_url_rule('/mentor/accept-studentreq' , view_func = MentorUrl.AcceptingStudentReq , methods=['GET','POST'])
-# app.add_url_rule('/mentor/showconfirmedmeet' , view_func = MentorUrl.showConfirmedMeet , methods=['GET','POST'])
+app.add_url_rule('/mentor/showconfirmedmeet' , view_func = MentorUrl.showConfirmedMeet , methods=['GET','POST'])
 
 
 @app.route('/blogs', methods=['GET', 'POST'])

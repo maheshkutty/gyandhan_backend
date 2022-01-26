@@ -149,7 +149,9 @@ def showConfirmedRequest():
             req = request.json
             conn = get_db()
             cursor = conn.cursor()
-            cursor.execute("select * from Session_Requests sr where sr.status = 1 and sr.Stud_id = %s", (int(req["sid"])))
+            sql = "select sr.*,  DATE_FORMAT(sr.sdate, \"%s\") as strdate from Session_Requests sr where sr.status = 1 and sr.Stud_id = %s"
+            sql = sql % (str("%d-%m-%Y"),int(req["sid"]))
+            cursor.execute(sql)
             sessionResult = cursor.fetchall()
             allSessionRequest = []
             for item in sessionResult:
@@ -157,8 +159,15 @@ def showConfirmedRequest():
                 individualReq["startTime"] = item[2]
                 individualReq["endTime"] = item[6]
                 individualReq["sid"] = item[0]
-                meetLink = cursor.execute("select Men_mlink from Mentors where Men_id = %s", (int(item[5])))
-                individualReq["meetLink"] = meetLink[0]
+                individualReq["sdate"] = str(item[8])
+                cursor.execute("select Men_mlink from Mentors where Men_id = %s", (int(item[5])))
+                meetLink = cursor.fetchone()
+                if meetLink != None:
+                    meetLink = eval(meetLink[0])
+                    meetLink = meetLink[0]
+                else:
+                    meetLink = ""
+                individualReq["meetlink"] = meetLink
                 cursor.execute("select * from student_subjects where rid = %s", (int(item[0])))
                 subjects = cursor.fetchall()
                 individualReq["subjects"] = [item[1] for item in subjects]
@@ -196,6 +205,30 @@ def All_LiveClasses():
             return json.dumps(op ,indent=4, sort_keys=True, default=str)
 
 
+        except Exception as e:
+            print(e)
+            return jsonify({"msg":str(e), "status":"unsuccess"})
+
+def studPersonalDetails():
+    if request.method == "POST":
+        try:
+            conn = get_db()
+            cursor = conn.cursor()
+            content = request.json
+            sid = content["sid"]
+            cursor.execute("select * from Students s where Stud_id = %s" , (int(sid)))
+            data = cursor.fetchone()
+            print(data)
+            res = {}
+            if data == None:
+                return jsonify(res)
+            res["name"] = data[2]
+            res["class"] = data[3]
+            res["add"] = data[4]
+            res["score"] = data[5]
+            res["phone"] = data[6]
+            res["email"] = data[7]
+            return jsonify(res)
         except Exception as e:
             print(e)
             return jsonify({"msg":str(e), "status":"unsuccess"})
