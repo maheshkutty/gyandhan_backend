@@ -43,3 +43,20 @@ def validDate( startDate , endDate ):
     else:
         print("Not Valid")
         return [ 0 , 'In Valid timings']
+
+def ClassValidTime( startDate , endDate ):
+
+    st_d = datetime.strptime( startDate ,  '%Y-%m-%dT%H:%M' )
+    en_d = datetime.strptime( endDate ,  '%Y-%m-%dT%H:%M' )
+   
+    duration  = en_d - st_d
+    now  = datetime.now()
+    print("Now : ", now , type(now) )
+  
+    if( st_d > now ):
+        if( en_d > st_d ):
+            print("valid")
+            return [ 1 , duration ]
+    else:
+        print("Not Valid")
+        return [0 , 'In Valid timings']

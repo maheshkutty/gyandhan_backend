@@ -89,6 +89,37 @@ def BlogsComments():
                 return jsonify({"msg":str(e), "status":"unsuccess"})
 
 
+@app.route('/blogs/like', methods=['GET', 'POST'])
+def BlogsLike():  
+    if request.method == "POST":
+        try:
+            conn = get_db()
+            cursor = conn.cursor()
+            content = request.json            
+            b_id = int(content["b_id"])
+            action = str(content["action"])
+            cursor.execute("SELECT * from Blogs WHERE b_id = %s", (b_id))
+            res = cursor.fetchone()
+
+            res = dict((cursor.description[i][0], value) \
+               for i, value in enumerate(res)) 
+
+            print("============",res)
+            if action == "like" :
+                sql = "UPDATE Blogs SET b_likes = %s  WHERE b_id = %s" 
+                cursor.execute(sql, (int(res["b_likes"] + 1) , int(b_id)))
+
+            else:
+                sql = "UPDATE Blogs SET b_dislikes = %s  WHERE b_id = %s" 
+                cursor.execute(sql, (int(res["b_dislikes"] + 1) , int(b_id)))
+           
+            conn.commit()
+            cursor.close()
+            return jsonify({ "status":"success"})
+        except Exception as e:
+            return jsonify({"msg":str(e), "status":"unsuccess"})
+
+
 @app.route('/doubts', methods=['GET', 'POST'])
 def Doubts():  
     if request.method == "GET":
@@ -161,12 +192,9 @@ def DoubtsLike():
 
             print("============",res)
             if action == "like" :
-                sql = "UPDATE Doubts SET d_likes = %s  WHERE dt_id = %s" 
-                cursor.execute(sql, (int(res["d_likes"] + 1) , int(dt_id)))
+                sql = "UPDATE Doubts SET b_likes = %s  WHERE dt_id = %s" 
+                cursor.execute(sql, (int(res["b_likes"] + 1) , int(dt_id)))
 
-                # sql = "UPDATE Doubts SET d_likes = %s  WHERE dt_id = %s" 
-                # cursor.execute(sql, (int(res["d_likes"] + 1) , int(dt_id)))
-                
             else:
                 sql = "UPDATE Doubts SET d_dislikes = %s  WHERE dt_id = %s" 
                 cursor.execute(sql, (int(res["d_dislikes"] + 1) , int(dt_id)))
@@ -176,11 +204,6 @@ def DoubtsLike():
             return jsonify({ "status":"success"})
         except Exception as e:
             return jsonify({"msg":str(e), "status":"unsuccess"})
-
-        
-
-   
-   
 
 
  
