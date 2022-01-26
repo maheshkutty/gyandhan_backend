@@ -32,7 +32,7 @@ app.add_url_rule('/mentor/expertise' , view_func = MentorUrl.mentorsAvailibityCr
 app.add_url_rule('/mentor/studentreq' , view_func = MentorUrl.mappingStudentReq , methods=['GET','POST'])
 app.add_url_rule('/mentor/accept-studentreq' , view_func = MentorUrl.AcceptingStudentReq , methods=['GET','POST'])
 app.add_url_rule('/mentor/showconfirmedmeet' , view_func = MentorUrl.showConfirmedMeet , methods=['GET','POST'])
-
+app.add_url_rule('/mentor/showclasses' , view_func = MentorUrl.showClasses , methods=['GET','POST'])
 
 @app.route('/blogs', methods=['GET', 'POST'])
 def Blogs():  

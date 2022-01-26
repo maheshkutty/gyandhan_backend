@@ -212,8 +212,8 @@ def AcceptingStudentReq():
             mid = content["mid"]
             rid = content["rid"]
             sdate = str(content["sdate"])
-            sql = 'UPDATE Session_Requests SET status = 1 , Men_id = %s, sdate = STR_TO_DATE("%s", "%s-%s-%s") WHERE id = %s'
-            sql = sql % ((int(mid), str(sdate), str("%d"), str("%m"), str("%Y"), int(rid)))
+            sql = 'UPDATE Session_Requests SET status = 1 , Men_id = %s, sdate = STR_TO_DATE("%s", \"%s\") WHERE id = %s'
+            sql = sql % ((int(mid), str(sdate), str("%d-%m-%Y"), int(rid)))
             cursor.execute(sql)
             conn.commit()
             cursor.close()
@@ -244,7 +244,8 @@ def showConfirmedMeet():
                 individualReq["sdate"] = str(item[8])
                 cursor.execute("select Men_mlink from Mentors where Men_id = %s", (int(item[5])))
                 meetLink = cursor.fetchone()
-                if meetLink != None:
+                print(meetLink)
+                if meetLink[0] != "":
                     meetLink = eval(meetLink[0])
                     meetLink = meetLink[0]
                 else:
@@ -266,8 +267,6 @@ def showConfirmedMeet():
             print(e)
             return jsonify({"msg":str(e), "status":"unsuccess"})
 
-# def showConfirmedMeet():
-
 def Create_ClassAssignment():
     if request.method == "POST":
         try :
@@ -278,11 +277,39 @@ def Create_ClassAssignment():
             Class_id = str(content["Class_id"])
             A_Title = str(content["A_Title"])
             Content = str(content["content"])
-           
             cursor.execute("insert into Assignments (Men_id , Class_id , Content , A_Title ) values (%s,%s,%s,%s);", (str(Men_id) , Class_id , Content , A_Title))
             conn.commit()               
             cursor.close()
             return jsonify({"msg":"Successfully Class Assignment created", "status":"success"})
     
+        except Exception as e:
+            return jsonify({"msg":str(e), "status":"unsuccess"})
+
+def showClasses():
+    if request.method == "POST":
+        try:
+            conn = get_db()
+            cursor = conn.cursor()
+            content = request.json
+            cursor.execute("select Men_mlink from Mentors where Men_id = %s", (int(content["mid"])))
+            meetLink = cursor.fetchone()
+            print(meetLink)
+            if meetLink[0] != "":
+                meetLink = eval(meetLink[0])
+                meetLink = meetLink[0]
+            else:
+                meetLink = ""
+            cursor.execute("select * from Classes where Men_id = %s" % (int(content["mid"])))
+            res = cursor.fetchall()
+            allClasses = []
+            for item in res:
+                individualClass = {}
+                individualClass["startTime"] = item[1]
+                individualClass["endTime"] = item[2]
+                individualClass["title"] = item[7]
+                individualClass["meetLink"] = meetLink
+                allClasses.append(individualClass)
+            cursor.close()
+            return jsonify({"allClasses":allClasses, "status":"success"})
         except Exception as e:
             return jsonify({"msg":str(e), "status":"unsuccess"})

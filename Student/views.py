@@ -162,7 +162,7 @@ def showConfirmedRequest():
                 individualReq["sdate"] = str(item[8])
                 cursor.execute("select Men_mlink from Mentors where Men_id = %s", (int(item[5])))
                 meetLink = cursor.fetchone()
-                if meetLink != None:
+                if meetLink[0] != "":
                     meetLink = eval(meetLink[0])
                     meetLink = meetLink[0]
                 else:

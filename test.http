@@ -79,7 +79,7 @@ POST http://localhost:5000/student/showconfirmedmeet HTTP/1.1
 Content-Type: application/json
 
 {
-    "sid":"8"
+    "sid":"12"
 }
 
 ###
@@ -99,7 +99,7 @@ POST http://localhost:5000/mentor/showconfirmedmeet HTTP/1.1
 Content-Type: application/json
 
 {
-    "mid":"1"
+    "mid":"5"
 }
 ###
 
@@ -117,4 +117,18 @@ Content-Type: application/json
 
 {
     "sid":"8"
+}
+
+
+###
+GET http://localhost:5000/student/all-live HTTP/1.1
+Content-Type: application/json
+
+###
+
+POST http://localhost:5000/mentor/showclasses HTTP/1.1
+Content-Type: application/json
+
+{
+    "mid":"5"
 }
