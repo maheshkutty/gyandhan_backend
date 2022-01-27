@@ -205,8 +205,18 @@ def DoubtsLike():
         except Exception as e:
             return jsonify({"msg":str(e), "status":"unsuccess"})
 
-
- 
+@app.route('/subjects', methods=['GET', 'POST'])
+def showAllSubjects():
+    if request.method == "GET":
+        try:
+            conn = get_db()
+            cursor = conn.cursor()
+            cursor.execute("select subname from subjects")
+            data = cursor.fetchall()
+            res = [item[0] for item in data]
+            return jsonify(res)
+        except Exception as e:
+            return jsonify({"msg":str(e), "status":"unsuccess"})
 
 if __name__ == "__main__":   
     app.run(host='0.0.0.0', port=3000, debug=True ) # localhost
